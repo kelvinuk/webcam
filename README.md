@@ -28,8 +28,8 @@ export const defaultColorChangeCycle = 12.5; // 0.5 sec / 0.04 ms = 12.5 frames 
 export const defaultBestFrameForPhotoCapture = 6; // the 6th frame in the cycle as the lighting is more stable
 export const defaultBgPatterns = [ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 ];
 ```
-In short, we have 0.25 sec delay of each changable correct pattern.
-This 0.25 sec has enough window for the LCD stability and human reaction 
+In short, we have 0.25 sec delay of each changable color pattern.
+This 0.25 sec window should be good enough to address the LCD stability and human reaction 
 (Huamn response time is 0.08 sec)
 
 Remaindings
