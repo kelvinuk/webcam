@@ -1,26 +1,64 @@
+
+We capture 20 photos in 10 seconds following a predefined troggable backlight sequence. (We provide autosizing method to put all resizable photos in the gallary.
+However, the original samples are preserved. They can be sent back to the server.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/5c1f1142-cfd0-405c-80ac-c4af30967b27)
 
+The backlight relies on a changable black / white screen color. (The recording page has a small live video preview and control.
+User needs to premit the software to access the camera.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/6e5d937d-384a-4bf3-bfaf-757aa2a7e4f2)
 
-Remainder
-- Unit Test
+The software would choose the best camera if multiple capturable devices are attached
+(According to the documentation,  the latest getUserMedia should select the best camera)
+
+When the system has taken 20 photos, the system would stop recording, clean up allocated resources and leave the recording page.
+Back to gallery home page, the video recording page would be destroyed.
+
+
+Configurable Parameters
+```
+export const defaultConstraints: MediaStreamConstraints = {
+  audio: false,
+  video: {width: 1280, height: 720, frameRate: 25}, // 0.04 ms
+};
+
+export const defaultMimeType: string = 'video/webm; codecs="opus,vp8"';
+export const defaultVideoBufTimeslice = 10; // 10 ms
+// We have 20 cycles, each cycle consumes 0.5 seconds. We take a photo around 50% of each cycle
+export const defaultColorChangeCycle = 12.5; // 0.5 sec / 0.04 ms = 12.5 frames / per cycle
+export const defaultBestFrameForPhotoCapture = 6; // the 6th frame in the cycle as the lighting is more stable
+export const defaultBgPatterns = [ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 ];
+```
+In short, we have 0.25 sec delay of each changable color pattern.
+This 0.25 sec window should be good enough to address the LCD stability and human reaction 
+(Huamn response time is 0.08 sec)
+
+Remaindings
+- Unit Tests
+  - Jest test, cypress tests can be added.
 - Styling CSS improvement
 - Error Reporting (Using Toast box)
 
-
-========================
+Remarks:
+- I left some console.log for illustration purposes. Those message should be cleaned up for real deployment
+- Currently, I use alert to replace console.error. However, they should be displayed by toast box
+- For real deployment, we can use next JS to handle the server side communication and transfer the images back to server
+- Logitech cammera cannot switch off its light once activated
+- For multiple capture devices, the getUserMedia may give the wrong selection. It may still provide the media stream even the USB is disconnected.
+    
+========================================================================================================================
 
 
 
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### `yarn install`
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+### `yarn start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -28,12 +66,12 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-### `npm test`
+### `yarn test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+### `yarn build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
@@ -43,7 +81,7 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+### `yarn eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
