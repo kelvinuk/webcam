@@ -10,8 +10,8 @@ User needs to premit the software to access the camera.
 The software would choose the best camera if multiple capturable devicec are attached
 (According to the documentation,  the latest getUserMedia should select the best camera)
 
-When the system has taken 20 photos, the syste would stop recording, clean up resources and leave the recording page.
-Back to gallery home page, the allocation of video recording page would be destroyed.
+When the system has taken 20 photos, the system would stop recording, clean up resources allocation and leave the recording page.
+Back to gallery home page, the video recording page would be destroyed.
 
 We provide autosizing method to put all resizable photos in the gallary.
 However, the original samples are preserved. They can be sent back to the server.
