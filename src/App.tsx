@@ -5,15 +5,15 @@ import Photo from './Photo';
 import './App.css';
 
 const App: React.FC = () => {
-  const [ isCompleted, setIsCompleted ] = useState(false);
+  const [ isAlbum, setIsAlbum ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
 
   const buttonText: string = useMemo(() => 
-    isCompleted ? 'Ready to take photos' : 'Home'
-  , [isCompleted]);
+    isAlbum ? 'Ready to take photos' : 'Back to Album'
+  , [isAlbum]);
 
   const handleClick: React.MouseEventHandler = () => {
-    setIsCompleted((prev) => {
+    setIsAlbum((prev) => {
       if (prev) {
         setImages([]);
       }
@@ -23,14 +23,14 @@ const App: React.FC = () => {
 
   const handleRecordingResult = (imageList: ImageBitmap[]): void => {
     setImages([...imageList]);
-    setIsCompleted(true);
+    setIsAlbum(true);
   };
 
   return (
     <div className="App">
       <button onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
       {
-        !isCompleted ?
+        !isAlbum ?
         <VideoRecorder onRecordingResult={handleRecordingResult}/> :
         <div style={{ flex: '1 1 auto', minHeight: '95vh'}}>
           <AutoSizer>

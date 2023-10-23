@@ -211,7 +211,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
               <div className="video-controls">
                 {!permission ? (
                   <button onClick={checkCameraPermission} type="button">
-                    Get Camera Device
+                    Allow Camera Recording
                   </button>
                 ):null}
                 {permission ? (
