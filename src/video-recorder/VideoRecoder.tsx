@@ -110,7 +110,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       if (colorChangeCycle > 0 && bgPatterns.length > 0) {
         const frameCount = (chunksRef.current.length -1)% colorChangeCycle;
         const t = Math.floor((chunksRef.current.length - 1) / colorChangeCycle);
-        if (frameCount <= 0.5) {
+        if (frameCount < 1) {
           const bg = bgPatterns[t % bgPatterns.length];
           console.log(`Cycle: ${t}, BG Pattern: ${bg}`);
           setBacklight(bg);
@@ -118,7 +118,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
             console.log('Stopping');
             stopRecording();
           }
-        } else if (frameCount >= bestFrameForPhotoCapture && frameCount <= bestFrameForPhotoCapture + 0.5) {
+        } else if (frameCount >= bestFrameForPhotoCapture && frameCount < bestFrameForPhotoCapture + 1) {
           console.log(`Cycle: ${t}, Photo at ${frameCount}`);
           displayMsgRef.current = `${t}`;
           setCount(t);
