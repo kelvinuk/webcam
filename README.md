@@ -5,7 +5,7 @@
 Remainder
 - Unit Test
 - Styling CSS improvement
-
+- Error Reporting (Using Toast box)
 
 
 ========================
