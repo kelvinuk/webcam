@@ -80,6 +80,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       stream?.getTracks().forEach(function(track) {
         track.stop();
       });
+      setStream(undefined);
+      imageCaptureDeviceRef.current = undefined;
+      
       setIsRecording(false);
       console.log('stopped completely');
       return true;
