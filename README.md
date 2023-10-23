@@ -1,5 +1,6 @@
 
-We capture 20 photos in 10 seconds following a predefined troggable backlight sequence.
+We capture 20 photos in 10 seconds following a predefined troggable backlight sequence. (We provide autosizing method to put all resizable photos in the gallary.
+However, the original samples are preserved. They can be sent back to the server.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/5c1f1142-cfd0-405c-80ac-c4af30967b27)
 
 The backlight relies on a changable black / white screen color.
@@ -13,8 +14,6 @@ The software would choose the best camera if multiple capturable devicec are att
 When the system has taken 20 photos, the system would stop recording, clean up resources allocation and leave the recording page.
 Back to gallery home page, the video recording page would be destroyed.
 
-We provide autosizing method to put all resizable photos in the gallary.
-However, the original samples are preserved. They can be sent back to the server.
 
 Configurable Parameters
 ```
