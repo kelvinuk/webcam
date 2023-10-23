@@ -1,10 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { AutoSizer } from "react-virtualized";
 import { VideoRecorder } from './video-recorder';
 import Photo from './Photo';
 import './App.css';
 
-const App: React.FC = () => {
+export type AppProps = {
+  lockNavButton?: boolean;
+};
+
+const App: React.FC<AppProps> = ({lockNavButton}) => {
   const [ isAlbum, setIsAlbum ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
   const [ buttonDisabled, setButtonDisabled ] = useState(false);
@@ -33,9 +37,10 @@ const App: React.FC = () => {
     setButtonDisabled(false);
   };
 
-  const handleCameraEnabled = (): void => {
-    setButtonDisabled(true);
-  };
+  const handleCameraEnabled = useCallback((): void => {
+    if (lockNavButton)
+      setButtonDisabled(true);
+  }, [lockNavButton]);
 
   return (
     <div className="App">

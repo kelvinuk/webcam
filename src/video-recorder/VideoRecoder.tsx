@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { VideoRecorderProps, defaultColorChangeCycle, defaultConstraints, defaultBgPatterns, defaultMimeType, defaultVideoBufTimeslice, defaultBestFrameForPhotoCapture } from "./types";
 import { ImageCapture } from 'image-capture';
 import './index.css';
@@ -17,11 +17,11 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const chunksRef = useRef<BlobPart[]>([]);
   const imagesRef = useRef<ImageBitmap[]>([]);
   const displayMsgRef = useRef<string>('');
-  const mediaRecorder = useRef<MediaRecorder | undefined>(undefined);
+  const mediaRecorderRef = useRef<MediaRecorder | undefined>(undefined);
   const imageCaptureDeviceRef = useRef<any>(undefined);
+  const streamRef = useRef<MediaStream | undefined>(undefined);
   const [permission, setPermission] = useState(false);
   const [isRecording, setIsRecording ] = useState(false);
-  const [stream, setStream] = useState<MediaStream | undefined>(undefined);
   const [backlight, setBacklight] = useState<number>(defaultBgPatterns.length > 0 ? defaultBgPatterns[0] : 0);
   const [count, setCount] = useState<number>(0);
 
@@ -45,7 +45,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         onCameraEnabled?.();
         console.log(mediaStream);
         setPermission(true);
-        setStream(mediaStream);
+        streamRef.current = mediaStream;
         const tracks: MediaStreamTrack[] = mediaStream.getVideoTracks() ?? [];
         if (tracks.length> 0) {
           imageCaptureDeviceRef.current = new ImageCapture(tracks[0]);
@@ -68,21 +68,27 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     return false;
   }, [constraints, onCameraEnabled]);
 
-  const stopRecording = useCallback(async (): Promise<boolean> => {
-    if (!mediaRecorder.current) {
+  const cleanUp = (): void => {
+    // stop camera
+    streamRef.current?.getTracks().forEach(function(track) {
+      track.stop();
+    });
+    streamRef.current = undefined;
+    imageCaptureDeviceRef.current = undefined;
+    mediaRecorderRef.current = undefined;
+  };
+
+  const stopRecording = useCallback((): boolean => {
+    if (!mediaRecorderRef.current) {
       console.log('no media recorder');
       return false;
     }
-
+    
     try {
-      mediaRecorder.current?.stop();
+      mediaRecorderRef.current?.stop();
 
       // stop camera
-      stream?.getTracks().forEach(function(track) {
-        track.stop();
-      });
-      setStream(undefined);
-      imageCaptureDeviceRef.current = undefined;
+      cleanUp();
 
       setIsRecording(false);
       console.log('stopped completely');
@@ -94,9 +100,8 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         alert(`Unknown error ${JSON.stringify(err)}`);
       }
     }
-
     return false;
-  }, [stream]);
+  }, []);
 
   const processFrame = (imageBitmap: ImageBitmap): void => {
     console.log(imageBitmap);
@@ -141,7 +146,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }, [mimeType, onRecordingResult]);
 
   const startRecording = useCallback(async (): Promise<boolean> => {
-    if (!permission || !stream) {
+    if (!permission || !streamRef.current) {
       console.log('no permission, no stream');
       return false;
     }
@@ -152,15 +157,15 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     }
     
     try {
-      if (!mediaRecorder.current) {
-        mediaRecorder.current = new MediaRecorder(stream, {mimeType});
-        mediaRecorder.current.onstop = handleMediaRecordStop;
-        mediaRecorder.current.ondataavailable = handleMediaRecordDataAvailable;
+      if (!mediaRecorderRef.current && streamRef.current) {
+        mediaRecorderRef.current = new MediaRecorder(streamRef.current, {mimeType});
+        mediaRecorderRef.current.onstop = handleMediaRecordStop;
+        mediaRecorderRef.current.ondataavailable = handleMediaRecordDataAvailable;
       }
 
       // start recorder with 10ms buffer
       setIsRecording(true);
-      mediaRecorder.current.start(videoBufTimeslice);
+      mediaRecorderRef.current?.start(videoBufTimeslice);
       
       return true;
     } catch (err) {
@@ -172,7 +177,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     }
 
     return false;
-  }, [handleMediaRecordDataAvailable, handleMediaRecordStop, isRecording, mimeType, permission, stream, videoBufTimeslice]);
+  }, [handleMediaRecordDataAvailable, handleMediaRecordStop, isRecording, mimeType, permission, videoBufTimeslice]);
 
   const handleClick: React.MouseEventHandler = useCallback(() => {
     isRecording ? stopRecording() : startRecording();
@@ -181,6 +186,12 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const buttonText: string = useMemo(() => 
     isRecording ? 'Stop Recording' : 'Start Recording'
   , [isRecording]);
+
+  useEffect(() => {
+    return () => { 
+      cleanUp();
+    };
+  }, []);
 
   return (
     <div className='backlight' style={ { backgroundColor: backlight === 0 ? 'black' : 'white' } }>
