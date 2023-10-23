@@ -7,10 +7,10 @@ The backlight relies on a changable black / white screen color. (The recording p
 User needs to premit the software to access the camera.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/6e5d937d-384a-4bf3-bfaf-757aa2a7e4f2)
 
-The software would choose the best camera if multiple capturable devicec are attached
+The software would choose the best camera if multiple capturable devices are attached
 (According to the documentation,  the latest getUserMedia should select the best camera)
 
-When the system has taken 20 photos, the system would stop recording, clean up resources allocation and leave the recording page.
+When the system has taken 20 photos, the system would stop recording, clean up allocated resources and leave the recording page.
 Back to gallery home page, the video recording page would be destroyed.
 
 
