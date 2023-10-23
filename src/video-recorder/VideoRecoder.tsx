@@ -13,6 +13,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   onCameraEnabled,
   onRecordingResult
 }) => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const liveVideoRef = useRef<HTMLVideoElement>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const imagesRef = useRef<ImageBitmap[]>([]);
@@ -180,14 +181,21 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }, [handleMediaRecordDataAvailable, handleMediaRecordStop, isRecording, mimeType, permission, videoBufTimeslice]);
 
   const handleClick: React.MouseEventHandler = useCallback(() => {
-    isRecording ? stopRecording() : startRecording();
-  }, [isRecording, startRecording, stopRecording]);
+    if (!permission)
+      checkCameraPermission();
+    else {
+      isRecording ? stopRecording() : startRecording();
+    }
+  }, [checkCameraPermission, isRecording, permission, startRecording, stopRecording]);
 
-  const buttonText: string = useMemo(() => 
-    isRecording ? 'Stop Recording' : 'Start Recording'
-  , [isRecording]);
+  const buttonText: string = useMemo(() =>  {
+    if (!permission)
+      return 'Allow Camera Recording';
+    return isRecording ? 'Stop Recording' : 'Start Recording'
+  }, [isRecording, permission]);
 
   useEffect(() => {
+    buttonRef.current?.focus();
     return () => { 
       cleanUp();
     };
@@ -213,14 +221,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
             </td>
             <td>
               <div className="video-controls">
-                {!permission ? (
-                  <button onClick={checkCameraPermission} type="button">
-                    Allow Camera Recording
-                  </button>
-                ):null}
-                {permission ? (
-                  <button onClick={handleClick}>{buttonText}</button>
-                ):null}
+                <button ref={buttonRef} onClick={handleClick}>{buttonText}</button>
               </div>
             </td>
           </tr>

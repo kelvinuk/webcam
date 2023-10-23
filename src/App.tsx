@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { AutoSizer } from "react-virtualized";
 import { VideoRecorder } from './video-recorder';
 import Photo from './Photo';
@@ -9,6 +9,7 @@ export type AppProps = {
 };
 
 const App: React.FC<AppProps> = ({lockNavButton}) => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [ isAlbum, setIsAlbum ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
   const [ buttonDisabled, setButtonDisabled ] = useState(false);
@@ -35,6 +36,7 @@ const App: React.FC<AppProps> = ({lockNavButton}) => {
     setImages([...imageList]);
     setIsAlbum(true);
     setButtonDisabled(false);
+    buttonRef.current?.focus();
   };
 
   const handleCameraEnabled = useCallback((): void => {
@@ -44,7 +46,7 @@ const App: React.FC<AppProps> = ({lockNavButton}) => {
 
   return (
     <div className="App">
-      <button disabled={buttonDisabled} onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
+      <button ref={buttonRef} disabled={buttonDisabled} onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
       {
         !isAlbum ?
         <VideoRecorder onCameraEnabled={handleCameraEnabled} onRecordingResult={handleRecordingResult}/> :
