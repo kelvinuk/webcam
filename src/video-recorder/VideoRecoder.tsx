@@ -10,6 +10,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   bgPatterns = defaultBgPatterns,
   colorChangeCycle = defaultColorChangeCycle,
   bestFrameForPhotoCapture = defaultBestFrameForPhotoCapture,
+  onCameraEnabled,
   onRecordingResult
 }) => {
   const liveVideoRef = useRef<HTMLVideoElement>(null);
@@ -42,6 +43,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
           //video: { ...video, deviceId: { exact: cameraId } }
         });
 
+        onCameraEnabled?.();
         console.log(mediaStream);
         setPermission(true);
         setStream(mediaStream);
@@ -65,7 +67,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       alert("The MediaRecorder API is not supported in this browser.");
     }
     return false;
-  }, [ constraints ]);
+  }, [constraints, onCameraEnabled]);
 
   const stopRecording = useCallback(async (): Promise<boolean> => {
     if (!mediaRecorder.current) {
@@ -82,7 +84,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       });
       setStream(undefined);
       imageCaptureDeviceRef.current = undefined;
-      
+
       setIsRecording(false);
       console.log('stopped completely');
       return true;

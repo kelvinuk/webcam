@@ -7,6 +7,7 @@ import './App.css';
 const App: React.FC = () => {
   const [ isAlbum, setIsAlbum ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
+  const [ buttonDisabled, setButtonDisabled ] = useState(false);
 
   const buttonText: string = useMemo(() => 
     isAlbum ? 'Ready to take photos' : 'Back to Album'
@@ -24,14 +25,19 @@ const App: React.FC = () => {
   const handleRecordingResult = (imageList: ImageBitmap[]): void => {
     setImages([...imageList]);
     setIsAlbum(true);
+    setButtonDisabled(false);
+  };
+
+  const handleCameraEnabled = (): void => {
+    setButtonDisabled(true);
   };
 
   return (
     <div className="App">
-      <button onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
+      <button disabled={buttonDisabled} onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
       {
         !isAlbum ?
-        <VideoRecorder onRecordingResult={handleRecordingResult}/> :
+        <VideoRecorder onCameraEnabled={handleCameraEnabled} onRecordingResult={handleRecordingResult}/> :
         <div style={{ flex: '1 1 auto', minHeight: '95vh'}}>
           <AutoSizer>
             {({ height, width }) => (

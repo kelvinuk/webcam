@@ -17,6 +17,7 @@ export type VideoRecorderProps = {
   videoBufTimeslice?: number; // start recorder with ms buffer
   bgPatterns? : number[];
   colorChangeCycle?: number;
-  bestFrameForPhotoCapture?: number
+  bestFrameForPhotoCapture?: number;
+  onCameraEnabled?: () => void;
   onRecordingResult?: (imageList: ImageBitmap[]) => void;
 };
