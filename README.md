@@ -1,6 +1,20 @@
+
+We capture 20 photos in 10 seconds following a predefined troggable backlight sequence.
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/5c1f1142-cfd0-405c-80ac-c4af30967b27)
 
+The backlight relies on a changable black / white screen color.
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/6e5d937d-384a-4bf3-bfaf-757aa2a7e4f2)
+
+The recording page has a small live video preview and control.
+User needs to premit the software to access the camera.
+The software would choose the best camera if multiple capturable devicec are attached
+(According to the documentation,  the latest getUserMedia should select the best camera)
+
+When the system has taken 20 photos, the syste would stop recording, clean up resources and leave the recording page.
+Back to gallery home page, the allocation of video recording page would be destroyed.
+
+We provide autosizing method to put all resizable photos in the gallary.
+However, the original samples are preserved. They can be sent back to the server.
 
 Configurable Parameters
 ```
@@ -16,9 +30,13 @@ export const defaultColorChangeCycle = 12.5; // 0.5 sec / 0.04 ms = 12.5 frames 
 export const defaultBestFrameForPhotoCapture = 6; // the 6th frame in the cycle as the lighting is more stable
 export const defaultBgPatterns = [ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 ];
 ```
+In short, we have 0.25 sec delay of each changable correct pattern.
+This 0.25 sec has enough window for the LCD stability and human reaction 
+(Huamn response time is 0.08 sec)
 
 Remaindings
 - Unit Tests
+  - Jest test, cypress tests can be added.
 - Styling CSS improvement
 - Error Reporting (Using Toast box)
 
@@ -26,7 +44,9 @@ Remarks:
 - I left some console.log for illustration purposes. Those message should be cleaned up for real deployment
 - Currently, I use alert to replace console.error. However, they should be displayed by toast box
 - For real deployment, we can use next JS to handle the server side communication and transfer the images back to server
-
+- Logitech cammera cannot switch off its light once activated
+- For multiple capture devices, the getUserMedia may give the wrong selection. It may still provide the media server even the USB is disconnected.
+    
 ========================================================================================================================
 
 
