@@ -3,11 +3,10 @@ We capture 20 photos in 10 seconds following a predefined troggable backlight se
 However, the original samples are preserved. They can be sent back to the server.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/5c1f1142-cfd0-405c-80ac-c4af30967b27)
 
-The backlight relies on a changable black / white screen color.
+The backlight relies on a changable black / white screen color. (The recording page has a small live video preview and control.
+User needs to premit the software to access the camera.)
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/6e5d937d-384a-4bf3-bfaf-757aa2a7e4f2)
 
-The recording page has a small live video preview and control.
-User needs to premit the software to access the camera.
 The software would choose the best camera if multiple capturable devicec are attached
 (According to the documentation,  the latest getUserMedia should select the best camera)
 
