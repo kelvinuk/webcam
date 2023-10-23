@@ -1,0 +1,25 @@
+.recorded-player1 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.recorded-player {
+	height: 200px;
+	width: 400px;
+	align-items: center;
+}
+
+.live-player {
+	height: 200px;
+	width: 400px;
+	border: 1px solid #646cff;
+	margin-bottom: 30px;
+}
+
+.backlight {
+  border: 1px;
+  border-color: 'green';
+	height: 600px;
+	width: 1600px;
+}

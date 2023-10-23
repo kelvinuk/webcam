@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback, useMemo, useState } from 'react';
+import { VideoRecorder } from './video-recorder';
+import Photo from './Photo';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+export type VideoFrameProps = {
+  width?: number;
+  height?: number;
+};
+
+const App: React.FC<VideoFrameProps> = ({
+  width = 1024,
+  height = 600,
+}) => {
+  const [ isCompleted, setIsCompleted ] = useState(false);
+  const [images, setImages] = useState<ImageBitmap[]>([]);
+
+  const handleClick: React.MouseEventHandler = () => {
+    setIsCompleted((prev) => {
+      if (prev) {
+        setImages([]);
+      }
+      return !prev;
+    });
+  };
+
+  const buttonText: string = useMemo(() => 
+    isCompleted ? 'Ready to take photos' : 'Go back'
+  , [isCompleted]);
+
+  const handleRecordingResult = useCallback((imageList: ImageBitmap[]): void => {
+    setImages([...imageList]);
+    console.log(imageList);
+
+    setIsCompleted(true);
+
+  }, []);
+
+  return (<div className="App">
+    <button onClick={handleClick}>{buttonText}</button>
+    {
+      !isCompleted &&
+      <VideoRecorder onRecordingResult={handleRecordingResult}/>
+    }
+    <div>
+    {
+      images.map((imageBitmap) => <Photo imageBitmap={imageBitmap}/>)
+    }
     </div>
-  );
+  </div>);
 }
 
 export default App;
+
