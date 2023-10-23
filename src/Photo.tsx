@@ -2,12 +2,14 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 
 export type PhotoProps = {
+  id: number;
   imageBitmap: ImageBitmap;
   width?: number;
   height?: number;
 }
 
 const Photo: React.FC<PhotoProps> = ({
+  id,
   imageBitmap,
   width = imageBitmap.width,
   height = imageBitmap.height,
@@ -47,7 +49,8 @@ const Photo: React.FC<PhotoProps> = ({
   },[renderPhotos]);
 
   return (
-    <canvas 
+    <canvas
+      key={`photo-${id}`}
       ref={canvasRef}
       width={width}
       height={height}

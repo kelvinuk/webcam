@@ -27,19 +27,17 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <button onClick={handleClick}>{buttonText}</button>
+      <button onClick={handleClick} style={{ margin: '20px'}}>{buttonText}</button>
       {
         !isCompleted ?
         <VideoRecorder onRecordingResult={handleRecordingResult}/> :
         <div style={{ flex: '1 1 auto', minHeight: '75vh'}}>
           <AutoSizer>
-            {({ height, width }) => {
-              console.log(`${height} ${width}`)
-              return (<div style={ { height, width} }>
-                {images.map((imageBitmap) => <Photo height={height/4} width={width/5} imageBitmap={imageBitmap}/>)}
+            {({ height, width }) => (
+              <div style={ { height, width} }>
+                {images.map((imageBitmap, index) => <Photo id={index} height={height/4} width={width/5} imageBitmap={imageBitmap}/>)}
               </div>
-              )
-            }}      
+            )}      
           </AutoSizer>
         </div>
       }

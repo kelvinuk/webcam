@@ -74,8 +74,12 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     try {
       mediaRecorder.current?.stop();
 
+      // stop camera
+      stream?.getTracks().forEach(function(track) {
+        track.stop();
+      });
       setIsRecording(false);
-      console.log('stopped');
+      console.log('stopped completely');
       return true;
     } catch (err) {
       if (err instanceof Error) {
@@ -86,7 +90,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     }
 
     return false;
-  }, []);
+  }, [stream]);
 
   const processFrame = (imageBitmap: ImageBitmap): void => {
     console.log(imageBitmap);
@@ -106,14 +110,14 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         const t = Math.floor((chunksRef.current.length - 1) / colorChangeCycle);
         if (frameCount <= 0.5) {
           const bg = bgPatterns[t % bgPatterns.length];
-          console.log(`${t} ${bg}`);
+          console.log(`Cycle: ${t}, BG Pattern: ${bg}`);
           setBacklight(bg);
           if (t >= bgPatterns.length) {
             console.log('Stopping');
             stopRecording();
           }
         } else if (frameCount >= bestFrameForPhotoCapture && frameCount <= bestFrameForPhotoCapture + 0.5) {
-          console.log(frameCount);
+          console.log(`Cycle: ${t}, Photo at ${frameCount}`);
           displayMsgRef.current = `${t}`;
           setCount(t);
           if (imageCaptureDeviceRef.current) {
