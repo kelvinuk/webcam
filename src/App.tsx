@@ -1,18 +1,15 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { AutoSizer } from "react-virtualized";
 import { VideoRecorder } from './video-recorder';
 import Photo from './Photo';
 
-export type VideoFrameProps = {
-  width?: number;
-  height?: number;
-};
-
-const App: React.FC<VideoFrameProps> = ({
-  width = 1024,
-  height = 600,
-}) => {
+const App: React.FC = () => {
   const [ isCompleted, setIsCompleted ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
+
+  const buttonText: string = useMemo(() => 
+    isCompleted ? 'Ready to take photos' : 'Home'
+  , [isCompleted]);
 
   const handleClick: React.MouseEventHandler = () => {
     setIsCompleted((prev) => {
@@ -23,30 +20,31 @@ const App: React.FC<VideoFrameProps> = ({
     });
   };
 
-  const buttonText: string = useMemo(() => 
-    isCompleted ? 'Ready to take photos' : 'Go back'
-  , [isCompleted]);
-
-  const handleRecordingResult = useCallback((imageList: ImageBitmap[]): void => {
+  const handleRecordingResult = (imageList: ImageBitmap[]): void => {
     setImages([...imageList]);
-    console.log(imageList);
-
     setIsCompleted(true);
+  };
 
-  }, []);
-
-  return (<div className="App">
-    <button onClick={handleClick}>{buttonText}</button>
-    {
-      !isCompleted &&
-      <VideoRecorder onRecordingResult={handleRecordingResult}/>
-    }
-    <div>
-    {
-      images.map((imageBitmap) => <Photo imageBitmap={imageBitmap}/>)
-    }
+  return (
+    <div className="App">
+      <button onClick={handleClick}>{buttonText}</button>
+      {
+        !isCompleted ?
+        <VideoRecorder onRecordingResult={handleRecordingResult}/> :
+        <div style={{ flex: '1 1 auto', minHeight: '75vh'}}>
+          <AutoSizer>
+            {({ height, width }) => {
+              console.log(`${height} ${width}`)
+              return (<div style={ { height, width} }>
+                {images.map((imageBitmap) => <Photo height={height/4} width={width/5} imageBitmap={imageBitmap}/>)}
+              </div>
+              )
+            }}      
+          </AutoSizer>
+        </div>
+      }
     </div>
-  </div>);
+  );
 }
 
 export default App;

@@ -17,11 +17,30 @@ const Photo: React.FC<PhotoProps> = ({
   const renderPhotos = useCallback(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = imageBitmap.width;
-      canvas.height = imageBitmap.height;
-      canvas.getContext('2d')?.drawImage(imageBitmap, 0, 0);
+      var imgWidth = imageBitmap.width;
+      var screenWidth  = width;
+      var scaleX = 1;
+      if (imgWidth > screenWidth)
+          scaleX = screenWidth/imgWidth;
+      var imgHeight = imageBitmap.height;
+      var screenHeight = height;
+      var scaleY = 1;
+      if (imgHeight > screenHeight)
+          scaleY = screenHeight/imgHeight;
+      var scale = scaleY;
+      if(scaleX < scaleY)
+          scale = scaleX;
+      if(scale < 1){
+          imgHeight = imgHeight*scale;
+          imgWidth = imgWidth*scale;          
+      }
+  
+      canvas.height = imgHeight;
+      canvas.width = imgWidth;
+  
+      canvas.getContext('2d')?.drawImage(imageBitmap, 0, 0, imageBitmap.width, imageBitmap.height, 0, 0, imgWidth, imgHeight);
     }
-  }, [imageBitmap]);  
+  }, [height, imageBitmap, width]);  
 
   useEffect(() => {
     renderPhotos();

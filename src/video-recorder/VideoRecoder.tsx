@@ -1,6 +1,6 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { VideoRecorderProps, defaultColorChangeCycle, defaultConstraints, defaultBgPatterns, defaultMimeType, defaultVideoBufTimeslice, defaultBestFrameForPhotoCapture } from "./types";
-import { ImageCapture, ImageBitmap } from 'image-capture';
+import { ImageCapture } from 'image-capture';
 import './index.css';
 
 const VideoRecorder: React.FC<VideoRecorderProps> = ({
@@ -13,10 +13,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   onRecordingResult
 }) => {
   const liveVideoRef = useRef<HTMLVideoElement>(null);
-  const chunks = useRef<any>([]);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chunksRef = useRef<any>([]);
   const imagesRef = useRef<ImageBitmap[]>([]);
-
+  const displayMsgRef = useRef<string>('');
   const mediaRecorder = useRef<MediaRecorder | undefined>(undefined);
   const imageCaptureDeviceRef = useRef<any>(undefined);
   const [permission, setPermission] = useState(false);
@@ -24,6 +23,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [backlight, setBacklight] = useState<number>(defaultBgPatterns.length > 0 ? defaultBgPatterns[0] : 0);
+  const [count, setCount] = useState<number>(0);
 
   const checkCameraPermission = useCallback(async (): Promise<boolean> => {
     // Choose the best resolution camera
@@ -46,7 +46,6 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         const tracks: MediaStreamTrack[] = mediaStream.getVideoTracks() ?? [];
         if (tracks.length> 0) {
           imageCaptureDeviceRef.current = new ImageCapture(tracks[0]);
-          //console.log(imageCapture);
         }
 
         if (liveVideoRef.current) {
@@ -55,13 +54,13 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         return true;
       } catch (err) {
         if (err instanceof Error) {
-          console.error(err.message);
+          alert(err.message);
         } else {
-          console.error(`Unknown error ${JSON.stringify(err)}`);
+          alert(`Unknown error ${JSON.stringify(err)}`);
         }
       }
     } else {
-      console.error("The MediaRecorder API is not supported in this browser.");
+      alert("The MediaRecorder API is not supported in this browser.");
     }
     return false;
   }, [ constraints ]);
@@ -72,13 +71,6 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       return false;
     }
 
-    /*
-    if (!isRecording) {
-      console.log('is not recording');
-      return false;
-    }
-    */
-
     try {
       mediaRecorder.current?.stop();
 
@@ -87,9 +79,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       return true;
     } catch (err) {
       if (err instanceof Error) {
-        console.error(err.message);
+        alert(err.message);
       } else {
-        console.error(`Unknown error ${JSON.stringify(err)}`);
+        alert(`Unknown error ${JSON.stringify(err)}`);
       }
     }
 
@@ -102,21 +94,19 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }
   
   const stopCamera = (error: Error) => {
-    console.error(error);
+    alert(error);
     // if (videoDevice) videoDevice.stop();  // turn off the camera
   }
 
   const handleMediaRecordDataAvailable = useCallback((ev: BlobEvent): void => {
     if (ev?.data?.size > 0) {
-      chunks.current.push(ev.data);
+      chunksRef.current.push(ev.data);
       if (colorChangeCycle > 0 && bgPatterns.length > 0) {
-        const frameCount = (chunks.current.length -1)% colorChangeCycle;
+        const frameCount = (chunksRef.current.length -1)% colorChangeCycle;
+        const t = Math.floor((chunksRef.current.length - 1) / colorChangeCycle);
         if (frameCount <= 0.5) {
-          const t = Math.floor((chunks.current.length - 1) / colorChangeCycle);
           const bg = bgPatterns[t % bgPatterns.length];
           console.log(`${t} ${bg}`);
-  
-  
           setBacklight(bg);
           if (t >= bgPatterns.length) {
             console.log('Stopping');
@@ -124,8 +114,10 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
           }
         } else if (frameCount >= bestFrameForPhotoCapture && frameCount <= bestFrameForPhotoCapture + 0.5) {
           console.log(frameCount);
+          displayMsgRef.current = `${t}`;
+          setCount(t);
           if (imageCaptureDeviceRef.current) {
-            //imageCaptureDeviceRef.current.takePhoto().then(processPhoto).catch(stopCamera);
+            // we can use takePhoto instead of using the video streaming
             imageCaptureDeviceRef.current.grabFrame().then(processFrame).catch(stopCamera);
           }
         }
@@ -134,10 +126,10 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }, [colorChangeCycle, bgPatterns, bestFrameForPhotoCapture, stopRecording]);
 
   const handleMediaRecordStop = useCallback((e: Event): void => {
-    const blob = new Blob(chunks.current, { type: mimeType });
+    const blob = new Blob(chunksRef.current, { type: mimeType });
     setVideoUrl(URL.createObjectURL(blob));
     onRecordingResult?.(imagesRef.current);
-    chunks.current = [];
+    chunksRef.current = [];
   }, [mimeType, onRecordingResult]);
 
   const startRecording = useCallback(async (): Promise<boolean> => {
@@ -165,15 +157,14 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
       return true;
     } catch (err) {
       if (err instanceof Error) {
-        console.error(err.message);
+        alert(err.message);
       } else {
-        console.error(`Unknown error ${JSON.stringify(err)}`);
+        alert(`Unknown error ${JSON.stringify(err)}`);
       }
     }
 
     return false;
   }, [handleMediaRecordDataAvailable, handleMediaRecordStop, isRecording, mimeType, permission, stream, videoBufTimeslice]);
-
 
   const handleClick: React.MouseEventHandler = useCallback(() => {
     isRecording ? stopRecording() : startRecording();
@@ -183,36 +174,48 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     isRecording ? 'Stop Recording' : 'Start Recording'
   , [isRecording]);
 
-  useEffect(() => {
-
-  }, []);
-  
   return (
-    <div>
-      <h2>Video Recorder</h2>
-      <div className="video-controls">
-        {!permission ? (
-          <button onClick={checkCameraPermission} type="button">
-            Get Camera Device
-          </button>
-        ):null}
-        {permission ? (
-          <button onClick={handleClick}>{buttonText}</button>
-        ):null}
-      </div>
-      <div className='backlight' style={ { backgroundColor: backlight === 0 ? 'black' : 'white' } }>
+    <div className='backlight' style={ { backgroundColor: backlight === 0 ? 'black' : 'white' } }>
+      <table>
+        <thead>
+          <tr>
+            <th>
+              <h2 style={{ color: 'gray'} }>Snapshot count - {count}</h2>
+            </th>
+            <th>
 
-      </div>
-      {videoUrl ? (
-        <div className="recorded">
-          <video className="recorded-player" src={videoUrl} controls></video>
-          <a download href={videoUrl}>
-            Download Recording
-          </a>
-        </div>        
-      ) : (
-        <video ref={liveVideoRef} autoPlay className="live-player"></video>
-      )}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {videoUrl ? (
+                <div className="recorded">
+                  <video className="recorded-player" src={videoUrl} controls></video>
+                  <a download href={videoUrl}>
+                    Download Recording
+                  </a>
+                </div>        
+              ) : (
+                <video ref={liveVideoRef} autoPlay className="live-player"></video>
+              )}
+            </td>
+            <td>
+              <div className="video-controls">
+                {!permission ? (
+                  <button onClick={checkCameraPermission} type="button">
+                    Get Camera Device
+                  </button>
+                ):null}
+                {permission ? (
+                  <button onClick={handleClick}>{buttonText}</button>
+                ):null}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
