@@ -2,13 +2,32 @@
 
 ![image](https://github.com/kelvinuk/webcam/assets/85465033/6e5d937d-384a-4bf3-bfaf-757aa2a7e4f2)
 
-Remainder
-- Unit Test
+Configurable Parameters
+```
+export const defaultConstraints: MediaStreamConstraints = {
+  audio: false,
+  video: {width: 1280, height: 720, frameRate: 25}, // 0.04 ms
+};
+
+export const defaultMimeType: string = 'video/webm; codecs="opus,vp8"';
+export const defaultVideoBufTimeslice = 10; // 10 ms
+// We have 20 cycles, each cycle consumes 0.5 seconds. We take a photo around 50% of each cycle
+export const defaultColorChangeCycle = 12.5; // 0.5 sec / 0.04 ms = 12.5 frames / per cycle
+export const defaultBestFrameForPhotoCapture = 6; // the 6th frame in the cycle as the lighting is more stable
+export const defaultBgPatterns = [ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 ];
+```
+
+Remaindings
+- Unit Tests
 - Styling CSS improvement
 - Error Reporting (Using Toast box)
 
+Remarks:
+- I left some console.log for illustration purposes. Those message should be cleaned up for real deployment
+- Currently, I use alert to replace console.error. However, they should be displayed by toast box
+- For real deployment, we can use next JS to handle the server side communication and transfer the images back to server
 
-========================
+========================================================================================================================
 
 
 
