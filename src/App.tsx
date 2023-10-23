@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AutoSizer } from "react-virtualized";
 import { VideoRecorder } from './video-recorder';
 import Photo from './Photo';
+import './App.css';
 
 const App: React.FC = () => {
   const [ isCompleted, setIsCompleted ] = useState(false);
@@ -31,7 +32,7 @@ const App: React.FC = () => {
       {
         !isCompleted ?
         <VideoRecorder onRecordingResult={handleRecordingResult}/> :
-        <div style={{ flex: '1 1 auto', minHeight: '75vh'}}>
+        <div style={{ flex: '1 1 auto', minHeight: '95vh'}}>
           <AutoSizer>
             {({ height, width }) => (
               <div style={ { height, width} }>

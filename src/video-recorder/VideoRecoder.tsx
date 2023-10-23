@@ -30,9 +30,9 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
     if ("MediaRecorder" in window) {
       try {
         // get Media device - refenece Web APIs | MDN
-        //const deviceInfoList: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        const deviceInfoList: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         //const cameraId: string = deviceInfoList.sort((a,b) => { a.maxWidth > b.maxWidth }).deviceId;
-        //console.log(deviceInfoList);
+        console.log(deviceInfoList);
         //const cameraId: string = deviceInfoList[0].deviceId;
         //const video: MediaTrackConstraints = constraints.video as MediaTrackConstraints ?? {};
 
@@ -41,6 +41,8 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
           ...constraints,
           //video: { ...video, deviceId: { exact: cameraId } }
         });
+
+        console.log(mediaStream);
         setPermission(true);
         setStream(mediaStream);
         const tracks: MediaStreamTrack[] = mediaStream.getVideoTracks() ?? [];
