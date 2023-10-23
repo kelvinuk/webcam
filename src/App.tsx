@@ -8,6 +8,7 @@ const App: React.FC = () => {
   const [ isAlbum, setIsAlbum ] = useState(false);
   const [images, setImages] = useState<ImageBitmap[]>([]);
   const [ buttonDisabled, setButtonDisabled ] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string>('');
 
   const buttonText: string = useMemo(() => 
     isAlbum ? 'Ready to take photos' : 'Back to Album'
@@ -17,12 +18,16 @@ const App: React.FC = () => {
     setIsAlbum((prev) => {
       if (prev) {
         setImages([]);
+        setVideoUrl('');
       }
       return !prev;
     });
   };
 
-  const handleRecordingResult = (imageList: ImageBitmap[]): void => {
+  const handleRecordingResult = (imageList: ImageBitmap[], chunks: BlobPart[], mimeType: string): void => {
+    const blob = new Blob(chunks, { type: mimeType });
+    setVideoUrl(URL.createObjectURL(blob));
+
     setImages([...imageList]);
     setIsAlbum(true);
     setButtonDisabled(false);
@@ -48,6 +53,14 @@ const App: React.FC = () => {
           </AutoSizer>
         </div>
       }
+      {videoUrl && (
+        <div className="recorded">
+          <video className="recorded-player" src={videoUrl} controls></video>
+          <a download href={videoUrl}>
+            Download Recording
+          </a>
+        </div>         
+      )}
     </div>
   );
 }

@@ -19,5 +19,5 @@ export type VideoRecorderProps = {
   colorChangeCycle?: number;
   bestFrameForPhotoCapture?: number;
   onCameraEnabled?: () => void;
-  onRecordingResult?: (imageList: ImageBitmap[]) => void;
+  onRecordingResult?: (imageList: ImageBitmap[], chunks: BlobPart[], mimeType: string) => void;
 };

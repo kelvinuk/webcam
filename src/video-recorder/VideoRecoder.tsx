@@ -14,7 +14,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   onRecordingResult
 }) => {
   const liveVideoRef = useRef<HTMLVideoElement>(null);
-  const chunksRef = useRef<any>([]);
+  const chunksRef = useRef<BlobPart[]>([]);
   const imagesRef = useRef<ImageBitmap[]>([]);
   const displayMsgRef = useRef<string>('');
   const mediaRecorder = useRef<MediaRecorder | undefined>(undefined);
@@ -22,7 +22,6 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   const [permission, setPermission] = useState(false);
   const [isRecording, setIsRecording ] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
-  const [videoUrl, setVideoUrl] = useState<string>('');
   const [backlight, setBacklight] = useState<number>(defaultBgPatterns.length > 0 ? defaultBgPatterns[0] : 0);
   const [count, setCount] = useState<number>(0);
 
@@ -137,9 +136,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
   }, [colorChangeCycle, bgPatterns, bestFrameForPhotoCapture, stopRecording]);
 
   const handleMediaRecordStop = useCallback((e: Event): void => {
-    const blob = new Blob(chunksRef.current, { type: mimeType });
-    setVideoUrl(URL.createObjectURL(blob));
-    onRecordingResult?.(imagesRef.current);
+    onRecordingResult?.(imagesRef.current, chunksRef.current, mimeType);
     chunksRef.current = [];
   }, [mimeType, onRecordingResult]);
 
@@ -201,16 +198,7 @@ const VideoRecorder: React.FC<VideoRecorderProps> = ({
         <tbody>
           <tr>
             <td>
-              {videoUrl ? (
-                <div className="recorded">
-                  <video className="recorded-player" src={videoUrl} controls></video>
-                  <a download href={videoUrl}>
-                    Download Recording
-                  </a>
-                </div>        
-              ) : (
-                <video ref={liveVideoRef} autoPlay className="live-player"></video>
-              )}
+              <video ref={liveVideoRef} autoPlay className="live-player"></video>
             </td>
             <td>
               <div className="video-controls">

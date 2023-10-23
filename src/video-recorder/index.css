@@ -1,15 +1,3 @@
-.recorded-player1 {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.recorded-player {
-	height: 100px;
-	width: 200px;
-	align-items: center;
-}
-
 .live-player {
 	height: 100px;
 	width: 200px;
